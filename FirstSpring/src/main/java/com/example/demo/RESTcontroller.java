@@ -1,5 +1,6 @@
 package com.example.demo;
 
+import com.example.demo.obj.Answer;
 import com.example.demo.obj.Auto;
 import com.example.demo.obj.Client;
 
@@ -65,15 +66,15 @@ public class RESTcontroller {
                     if (client == null) {
                         clientrepository.save(new Client(clientname, clientyear, auto));
                     } else {
-                        return new ResponseEntity(new Answer("Client "+ clientname+" already have car "+client.getAuto().getModel()+"!"), HttpStatus.BAD_REQUEST);
+                        return new ResponseEntity(new Answer("Client " + clientname + " already have car " + client.getAuto().getModel() + "!"), HttpStatus.BAD_REQUEST);
                     }
                 } else {
-                    return new ResponseEntity(new Answer("Car "+autoname+" is not free!"), HttpStatus.BAD_REQUEST);
+                    return new ResponseEntity(new Answer("Car " + autoname + " is not free!"), HttpStatus.BAD_REQUEST);
                 }
             } else {
-                return new ResponseEntity(new Answer("We dont have this car "+autoname+"!"), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity(new Answer("We dont have this car " + autoname + "!"), HttpStatus.BAD_REQUEST);
             }
-            return new ResponseEntity(new Answer("Client "+ clientname+" added!"), HttpStatus.OK);
+            return new ResponseEntity(new Answer("Client " + clientname + " added!"), HttpStatus.OK);
         } catch (NumberFormatException e) {
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -82,43 +83,18 @@ public class RESTcontroller {
     @ApiOperation(value = "Remove client", response = String.class)
     @RequestMapping(value = "/del", method = RequestMethod.DELETE, produces = "application/json")
     public ResponseEntity DelClient(@RequestParam(value = "clientname") String clientname, @RequestParam(value = "autoname") String autoname) {
-        Client corectClient = null;
-        for (Client client : clientrepository.findByName(clientname)) {
-            if (client.getAuto().getModel().equals(autoname)) {
-                corectClient = client;
+            Client corectClient = null;
+            List<Client> list = clientrepository.findByName(clientname);
+                for (Client client : list) {
+                    if (client.getAuto().getModel().equals(autoname)) {
+                        corectClient = client;
+                    }
+                }
+            if (corectClient != null) {
+                clientrepository.delete(corectClient);
+            } else {
+                return new ResponseEntity(new Answer("No clien " + clientname + " with that car "+autoname+"!"), HttpStatus.BAD_REQUEST);
             }
-        }
-        if (corectClient != null) {
-            clientrepository.delete(corectClient);
-        } else {
-            return new ResponseEntity(new Answer("No clien "+ clientname+" with car "+autoname+"!"), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity(new Answer("Client "+ clientname+" deleted!"), HttpStatus.OK);
+        return new ResponseEntity(new Answer("Client " + clientname + " deleted!"), HttpStatus.OK);
     }
-    
-    private class Answer{
-        private String answer;
-
-        public Answer(String answer) {
-            this.answer = answer;
-        }
-
-        public Answer() {
-        }
-
-        public String getAnswer() {
-            return answer;
-        }
-
-        public void setAnswer(String answer) {
-            this.answer = answer;
-        }
-
-        @Override
-        public String toString() {
-            return "{\"answer\":\"" + answer + "\"}";
-        }
-        
-    }
-
 }
