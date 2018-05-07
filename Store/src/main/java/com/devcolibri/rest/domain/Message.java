@@ -1,5 +1,5 @@
 
-package store.controller;
+package com.devcolibri.rest.domain;
 
 /**
  *
